@@ -3,8 +3,8 @@ import React from 'react'
 const Header = () => {
   return (
     <div>
-        <nav className='header'>TITLE</nav>
-        <p>Welcome to </p>
+        <h1 className='header'>Movieverse</h1>
+        <p>Dive into the movieverse — one search at a time</p>
 
     </div>
   )
