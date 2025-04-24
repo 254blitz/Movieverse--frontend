@@ -1,10 +1,17 @@
-import React from 'react'
-
-function SearchBar() {
-  return (
-    <div>SearchBar</div>
-  )
-}
+import React from 'react';
 
 
-export default SearchBar
+const SearchBar = ({ searchTerm, onSearchChange, onSearch }) => (
+  <div className="search-container">
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={(e) => onSearchChange(e.target.value)}
+      placeholder="Search for a movie..."
+      id="search-input"
+    />
+    <button id="search-btn" onClick={onSearch}>Search</button>
+  </div>
+);
+
+export default SearchBar;
