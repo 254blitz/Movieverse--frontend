@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const SearchBar = ({ searchTerm, onSearchChange, onSearch }) => (
   <div className="search-container">
     <input
