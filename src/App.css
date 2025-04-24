@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 *{
-  text-align: center;background-color: var(--header-colors);
-
+  text-align: center;
 }
 
 :root {
@@ -14,13 +13,4 @@
 
 }
 
-.header {
-  text-align: center;
-  background-color: var(--body-colors);
-  font-family: var(--header-font);
-  color: white;
-}
 
-p {
-  color: var(--text-colors);
-}
