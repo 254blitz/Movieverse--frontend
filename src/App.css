@@ -1,16 +1,138 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
-*{
-  text-align: center;
-}
-
 :root {
   --header-font: "Oswald", serif;
-  --body-font: "Roboto" , serif;
+  --body-font: "Roboto", serif;
   --header-colors: rgb(3, 0, 0);
-  --body-colors: rgb(255, 166, 0);
-  --text-colors: rgb(255, 255, 255);
-
+  --body-colors: #ffffff;
+  --text-colors: #000000; 
+  --card-bg: #f4f4f4;
 }
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--body-font);
+}
 
+body {
+  background-color: var(--body-colors);
+  color: var(--text-colors);
+  text-align: center;
+  padding: 20px;
+}
+
+.App-header {
+  background-color: var(--header-colors);
+  padding: 20px;
+  color: var(--body-colors);
+}
+
+.App-header h1 {
+  font-family: var(--header-font);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.search-bar {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.search-bar input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 300px;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: var(--header-colors);
+  color: var(--body-colors);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.search-bar button:hover {
+  background-color: #1a1a1a;
+}
+
+.content-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.movie-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.movie-list li {
+  margin: 10px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s;
+}
+
+.movie-list li:hover {
+  transform: scale(1.05);
+}
+
+.movie-details {
+  max-width: 600px;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+  color: var(--text-colors);
+}
+
+.movie-details h2 {
+  font-family: var(--header-font);
+  margin-bottom: 15px;
+}
+
+.movie-details img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.movie-details p {
+  margin: 8px 0;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-bar input {
+    width: 100%;
+  }
+
+  .content-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
