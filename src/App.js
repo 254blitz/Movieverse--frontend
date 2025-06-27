@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from './AuthContext'; 
 import './App.css';
 import Header from './Components/Header';
 import SearchBar from './Components/SearchBar';
 
-const apiKey = '183fa13d';
-
 function App() {
+  const { user, logout, token } = useContext(AuthContext);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -16,54 +17,76 @@ function App() {
     setSearchTerm(value);
   };
 
- const fetchMovies = async (query) => {
-  if (!query.trim()) {
-    setError('Please enter a valid search term.');
-    return;
-  }
-
-  setLoading(true);
-  setError('');
-  setSelectedMovie(null);
-
-  try {
-    // Call your Flask backend
-    const response = await fetch(`http://localhost:5000/api/movies?query=${encodeURIComponent(query)}`);
-    const data = await response.json();
-
-    if (!data.error) {
-      setMovies(data);
-    } else {
-      setMovies([]);
-      setError(data.error || 'No results found.');
+  const fetchMovies = async (query) => {
+    if (!query.trim()) {
+      setError('Please enter a valid search term.');
+      return;
     }
-  } catch (err) {
-    setError('Error fetching data: ' + err.message);
-    setMovies([]);
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setLoading(true);
+    setError('');
+    setSelectedMovie(null);
+
+    try {
+      const response = await fetch(`https://movieverse-backend.onrender.com/api/movies?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (!data.error) {
+        setMovies(data.results || data); 
+      } else {
+        setMovies([]);
+        setError(data.error || 'No results found.');
+      }
+    } catch (err) {
+      setError('Error fetching data: ' + err.message);
+      setMovies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getMovieDetails = async (imdbId) => {
-  setLoading(true);
-  setError('');
-  try {
-    const response = await fetch(`http://localhost:5000/api/movies/${imdbId}`);
-    const data = await response.json();
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(`https://movieverse-backend.onrender.com/api/movies/${imdbId}`);
+      const data = await response.json();
 
-    if (!data.error) {
-      setSelectedMovie(data);
-    } else {
-      setError(data.error || 'Could not load movie details.');
+      if (!data.error) {
+        setSelectedMovie(data);
+      } else {
+        setError(data.error || 'Could not load movie details.');
+      }
+    } catch (err) {
+      setError('Error fetching movie details: ' + err.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError('Error fetching movie details: ' + err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  const handleAddFavorite = async () => {
+    if (!selectedMovie) return;
+
+    const response = await fetch('https://movieverse-backend.onrender.com/api/favorites', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        movie_id: selectedMovie.imdbID,
+        title: selectedMovie.Title,
+        poster_url: selectedMovie.Poster,
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert('Added to favorites');
+    } else {
+      alert(data.error || 'Failed to add favorite');
+    }
+  };
 
   const handleSearch = () => {
     fetchMovies(searchTerm);
@@ -86,6 +109,12 @@ function App() {
           onSearchChange={handleSearchChange}
           onSearch={handleSearch}
         />
+        {user && (
+          <div className="user-info">
+            <p>Logged in as: {user.username || user.email}</p>
+            <button onClick={logout}>Logout</button>
+          </div>
+        )}
       </header>
       <main>
         {loading && <p>Loading...</p>}
@@ -121,6 +150,10 @@ function App() {
               <p><strong>Actors:</strong> {selectedMovie.Actors}</p>
               <p><strong>Plot:</strong> {selectedMovie.Plot}</p>
               <p><strong>IMDb Rating:</strong> {selectedMovie.imdbRating}</p>
+
+              {token && (
+                <button onClick={handleAddFavorite}>Add to Favorites</button>
+              )}
             </div>
           )}
         </div>
