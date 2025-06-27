@@ -16,51 +16,54 @@ function App() {
     setSearchTerm(value);
   };
 
-  const fetchMovies = async (query) => {
-    if (!query.trim()) {
-      setError('Please enter a valid search term.');
-      return;
-    }
+ const fetchMovies = async (query) => {
+  if (!query.trim()) {
+    setError('Please enter a valid search term.');
+    return;
+  }
 
-    setLoading(true);
-    setError('');
-    setSelectedMovie(null);
-    try {
-      const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${apiKey}`);
-      const data = await response.json();
+  setLoading(true);
+  setError('');
+  setSelectedMovie(null);
 
-      if (data.Response === 'True') {
-        setMovies(data.Search);
-      } else {
-        setMovies([]);
-        setError(data.Error || 'No results found.');
-      }
-    } catch (err) {
-      setError('Error fetching data: ' + err.message);
+  try {
+    // Call your Flask backend
+    const response = await fetch(`http://localhost:5000/api/movies?query=${encodeURIComponent(query)}`);
+    const data = await response.json();
+
+    if (!data.error) {
+      setMovies(data);
+    } else {
       setMovies([]);
-    } finally {
-      setLoading(false);
+      setError(data.error || 'No results found.');
     }
-  };
+  } catch (err) {
+    setError('Error fetching data: ' + err.message);
+    setMovies([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const getMovieDetails = async (imdbId) => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${apiKey}`);
-      const data = await response.json();
+  setLoading(true);
+  setError('');
+  try {
+    const response = await fetch(`http://localhost:5000/api/movies/${imdbId}`);
+    const data = await response.json();
 
-      if (data.Response === 'True') {
-        setSelectedMovie(data);
-      } else {
-        setError(data.Error || 'Could not load movie details.');
-      }
-    } catch (err) {
-      setError('Error fetching movie details: ' + err.message);
-    } finally {
-      setLoading(false);
+    if (!data.error) {
+      setSelectedMovie(data);
+    } else {
+      setError(data.error || 'Could not load movie details.');
     }
-  };
+  } catch (err) {
+    setError('Error fetching movie details: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSearch = () => {
     fetchMovies(searchTerm);
