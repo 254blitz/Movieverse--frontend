@@ -41,22 +41,26 @@ function Login() {
         headers: { 
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // For cookie-based auth
+        credentials: 'include',
         body: JSON.stringify({
           username: formData.username,
           password: formData.password
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
 
-      // Successful login
-      login(data.access_token);
-      navigate('/'); // Redirect to home page
+      const data = await response.json();
+      
+      if (data.access_token) {
+        login(data.access_token);
+        navigate('/'); 
+      } else {
+        throw new Error('No access token received');
+      }
       
     } catch (error) {
       setErrors({ api: error.message || 'Login failed. Please try again.' });
