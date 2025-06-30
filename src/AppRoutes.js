@@ -1,27 +1,23 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Favorites from './Favorites';
-import ProtectedRoute from './ProtectedRoute';
-import Login from './Components/Login.jsx';
-import App from './App'; 
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
+import Home from './Home';
+import Login from './Components/Login';
+import Register from './Components/Register';
 
 function AppRoutes() {
-  return (  
-    <Router>
+  const { user } = useContext(AuthContext);
+
+  return (
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route
-          path="/favorites"
-          element={
-            <ProtectedRoute>
-              <Favorites />
-            </ProtectedRoute>
-          }
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+        <Route 
+          path="/" 
+          element={user ? <Home /> : <Navigate to="/login" />} 
         />
-        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
-
-export default AppRoutes;
