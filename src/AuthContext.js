@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
   const login = (newToken) => {
     localStorage.setItem('token', newToken);
     setToken(newToken);
-    // You might want to decode the token to set user info
     setUser({ username: 'extracted_from_token' });
   };
 
