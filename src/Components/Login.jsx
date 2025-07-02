@@ -1,133 +1,60 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
+import '../App.css'; 
 
 function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({ username: '', password: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
-    if (!formData.password) newErrors.password = 'Password is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
+  
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    await login(formData); 
+    navigate('/');
+  };
 
-    setIsSubmitting(true);
-    setErrors({});
-
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      
-      if (data.access_token) {
-        login(data.access_token);
-        navigate('/'); 
-      } else {
-        throw new Error('No access token received');
-      }
-      
-    } catch (error) {
-      setErrors({ api: error.message || 'Login failed. Please try again.' });
-      console.error('Login error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleForgotPassword = async () => {
+    await login({ username: 'Demo User' });
+    navigate('/');
   };
 
   return (
     <div className="auth-container">
       <h2>Login to MovieVerse</h2>
-      
-      {errors.api && (
-        <div className="alert alert-error">
-          {errors.api}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <div className="form-group">
           <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            name="username"
-            type="text"
+          <input 
+            id="username" 
+            name="username" 
+            type="text" 
             value={formData.username}
             onChange={handleChange}
-            className={errors.username ? 'error' : ''}
-            disabled={isSubmitting}
           />
-          {errors.username && (
-            <span className="error-message">{errors.username}</span>
-          )}
         </div>
-
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
+          <input 
+            id="password" 
+            name="password" 
             type="password"
             value={formData.password}
             onChange={handleChange}
-            className={errors.password ? 'error' : ''}
-            disabled={isSubmitting}
           />
-          {errors.password && (
-            <span className="error-message">{errors.password}</span>
-          )}
         </div>
-
-        <button 
-          type="submit" 
-          disabled={isSubmitting}
-          className="btn-primary"
-        >
-          {isSubmitting ? 'Logging in...' : 'Login'}
-        </button>
+        <button type="submit" className="btn-primary">Login</button>
       </form>
-
       <div className="auth-footer">
         <p>Don't have an account? <Link to="/register">Register</Link></p>
-        <p><Link to="/forgot-password">Forgot password?</Link></p>
+        <p><button type="button" className="link-button" onClick={handleForgotPassword}>Forgot password?</button></p>
       </div>
     </div>
   );
 }
-
 export default Login;

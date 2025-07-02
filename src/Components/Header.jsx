@@ -1,35 +1,19 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import './Header.css';
 
-const Header = () => {
+function Header() {
   const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  const handleAuthAction = () => {
-    if (user) {
-      logout();
-      navigate('/login');
-    } else {
-      navigate('/login');
-    }
-  };
 
   return (
-    <div className="header">
-      <div className="header-content">
+    <header className="App-header">
+      <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
         <h1>Movieverse</h1>
-        <p>Dive into the movieverse — one search at a time</p>
-      </div>
-      <button 
-        onClick={handleAuthAction}
-        className="auth-button"
-      >
-        {user ? 'Logout' : 'Login'}
-      </button>
-    </div>
+      </Link>
+      <p>Dive into the movieverse — one search at a time</p>
+      {user && <button onClick={logout} className="logout-button">Logout</button>}
+    </header>
   );
-};
+}
 
 export default Header;

@@ -1,25 +1,52 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from './AuthContext';
-import SearchBar from './Components/SearchBar';
+import React, { useState } from 'react';
 import MovieList from './Components/MovieList';
 import MovieDetails from './Components/MovieDetails';
-import LoadingSpinner from './Components/LoadingSpinner';
-import ErrorMessage from './Components/ErrorMessage';
+import { sampleMovies } from './mockData'; 
 
 function Home() {
-  const { token } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState('');
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [filteredMovies, setFilteredMovies] = useState(sampleMovies);
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setSelectedMovieId(null); 
+    if (term === '') {
+      setFilteredMovies(sampleMovies);
+    } else {
+      const lowercasedTerm = term.toLowerCase();
+      const results = sampleMovies.filter(movie => 
+        movie.Title.toLowerCase().includes(lowercasedTerm)
+      );
+      setFilteredMovies(results);
+    }
+  };
+
+  const selectedMovie = sampleMovies.find(m => m.imdbID === selectedMovieId);
 
   return (
     <>
-      <SearchBar/>
-      <LoadingSpinner loading={loading} />
-      <ErrorMessage error={error} />
-      
+      <div className="search-bar">
+        <input 
+          type="text"
+          placeholder="Search for a movie..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
+
       <div className="content-container">
+        {selectedMovieId ? (
+          <MovieDetails 
+            movie={selectedMovie} 
+            onBack={() => setSelectedMovieId(null)} 
+          />
+        ) : (
+          <MovieList 
+            movies={filteredMovies} 
+            onMovieSelect={setSelectedMovieId} 
+          />
+        )}
       </div>
     </>
   );

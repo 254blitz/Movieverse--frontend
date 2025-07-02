@@ -1,74 +1,63 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { AuthContext } from '../AuthContext';
+import '../App.css';
 
 function Register() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useContext(AuthContext); 
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
 
-  const handleRegister = async () => {
-    setIsLoading(true);
-    setMessage('');
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData), 
-        credentials: 'include'  
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      setMessage('Registration successful! Redirecting...');
-      setTimeout(() => navigate('/login'), 1500);
-    } catch (error) {
-      setMessage(error.message || 'Failed to connect to server. Please try again.');
-      console.error('Registration error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    await login(formData);
+    navigate('/');
   };
 
   return (
-    <div className="auth-form">
-      <h2>Register</h2>
-      {message && <div className="alert">{message}</div>}
-      
-      <input
-        value={formData.username}
-        onChange={(e) => setFormData({...formData, username: e.target.value})}
-        placeholder="Username"
-      />
-      <input
-        value={formData.email}
-        onChange={(e) => setFormData({...formData, email: e.target.value})}
-        placeholder="Email"
-        type="email"
-      />
-      <input
-        value={formData.password}
-        onChange={(e) => setFormData({...formData, password: e.target.value})}
-        placeholder="Password"
-        type="password"
-      />
-      <button 
-        onClick={handleRegister} 
-        disabled={isLoading}
-      >
-        {isLoading ? 'Registering...' : 'Register'}
-      </button>
+    <div className="auth-container">
+      <h2>Create Your Account</h2>
+      <form onSubmit={handleRegister}>
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input 
+            id="username"
+            name="username"
+            type="text"
+            value={formData.username}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit" className="btn-primary">Register</button>
+      </form>
+      <div className="auth-footer">
+        <p>Already have an account? <Link to="/login">Login</Link></p>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,11 @@
-export default function MovieDetails({ movie, onAddFavorite, onBack }) {
+import React from 'react';
+
+function MovieDetails({ movie, onBack }) {
+  if (!movie) return null;
+
   return (
     <div className="movie-details">
-      <button onClick={onBack}>← Back to results</button>
+      <button className="back-button" onClick={onBack}>← Back to list</button>
       <h2>{movie.Title}</h2>
       {movie.Poster !== 'N/A' && (
         <img src={movie.Poster} alt={`${movie.Title} Poster`} />
@@ -14,7 +18,8 @@ export default function MovieDetails({ movie, onAddFavorite, onBack }) {
       <p><strong>Actors:</strong> {movie.Actors}</p>
       <p><strong>Plot:</strong> {movie.Plot}</p>
       <p><strong>IMDb Rating:</strong> {movie.imdbRating}</p>
-      {onAddFavorite && <button onClick={onAddFavorite}>Add to Favorites</button>}
     </div>
   );
 }
+
+export default MovieDetails;

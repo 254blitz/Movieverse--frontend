@@ -3,50 +3,48 @@ import React, { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  // We still use localStorage to simulate staying logged in after a refresh.
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState(null);
 
-  const login = async (credentials) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
+  /**
+   * SIMULATED LOGIN
+   * This function mimics the real login process. Instead of making an API call,
+   * it immediately sets a fake token and user object.
+   */
+// Inside src/AuthContext.js
 
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('token', data.access_token);
-        setToken(data.access_token);
-        setUser({ username: credentials.username });
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
-  };
+const login = async (credentials) => {
+  console.log('Simulating login...');
+  
+  const fakeToken = 'fake-jwt-token-for-demo';
+  localStorage.setItem('token', fakeToken);
+  setToken(fakeToken);
+  
+  setUser({ username: credentials?.username || 'Demo User' });
+  
+  return Promise.resolve(true);
+};
 
   const logout = () => {
+    console.log('Logging out user.');
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   };
 
+  
   useEffect(() => {
     if (token) {
-      fetch(`${process.env.REACT_APP_API_URL}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(data => setUser(data))
-        .catch(() => logout());
+      console.log('Found fake token. Simulating user session.');
+      setUser({ username: 'Demo User' });
     }
   }, [token]);
 
+  const value = { user, token, login, logout };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
